@@ -58,3 +58,23 @@ Para habilitar ML, em um ambiente permitido, instale as dependências de `requir
 ## Resultados de validação
 
 Consulte o relatório final do trabalho: testes são realizados em bancos/cópias isolados, para não duplicar os dados entregues. A build e o navegador são testados com conexões externas bloqueadas mantendo localhost; isso não substitui um teste físico no notebook da escola.
+### Validação executada em 07/10/2026
+
+- `npx tsc --noEmit`, `npm run lint` e `npm run build`: passaram.
+- Cópia em outra pasta, usando Node/Python portáteis e launcher real: passou.
+- Build refeita dentro da cópia com conexões externas bloqueadas e localhost permitido: passou sem download.
+- Edge: abertura/Pular, login, dashboard populado, seis máquinas, detalhe/gráficos, Pareto, Jack-Knife, outros gráficos, classificação com reload e importação pela interface: passaram, sem erros JavaScript/hydration ou respostas HTTP com erro.
+- Upload das duas abas: 36 → 42 registros, 1.260 → 1.533 minutos, IDs preservados. Reinício do servidor manteve os dados.
+- Integridade SQLite, WAL, inicialização repetida, backup e rollback: passaram. Banco ausente gera erro e não cria substituto silencioso.
+- A entrega continua com 36 registros iniciais; testes usaram bancos separados preservados fora da entrega.
+- `.xls`/`.xld`: sem teste completo de upload; xlrd importado/verificado. O roteiro utiliza `.xlsx`, que foi testado.
+- ML: não validado com sucesso; DLLs bloqueadas no computador original. Distribuição básica sem pandas/modelo, scripts e planilhas reais preservados.
+- Sem teste físico no notebook da escola nem desconexão física da rede; o teste offline bloqueou conexões externas dos processos Node e requisições externas do navegador.
+
+### Arquivos desta preparação
+
+Criados: `INICIAR_VERSARY.bat`, `CONFIGURAR_VERSARY.bat`, `DEMONSTRACAO.md`, `scripts/prepare_demo.py`, `scripts/verify_runtime.mjs`, `scripts/create_demo_package.py`, duas planilhas em `demonstracao/`, runtimes locais e `entrega/Versary_DEMO`.
+
+Alterados: `scripts/parse_excel.py` (Excel sem pandas), `.gitignore`, `eslint.config.mjs` e `tsconfig.json` (cópias/runtimes gerados), `next.config.mjs` (raiz calculada pela localização do projeto), `src/app/maquinas/[machine]/page.tsx` (decodificação do nome). O empacotamento passou de PowerShell para Python, pois scripts PowerShell estavam bloqueados neste computador.
+
+Na migração precedente: `src/lib/sqlite.ts`, `scripts/manage_sqlite.py`, quatro APIs de dados/importação, `.env.example`, `.env.local`, `README.md`, `package.json` e `package-lock.json`. Adaptador MySQL e mysql2 mantidos. Nenhum redesenho, mudança de animação ou de fórmula foi feito nesta preparação.

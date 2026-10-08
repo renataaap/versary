@@ -27,11 +27,12 @@ if not exist ".next\BUILD_ID" (
  goto fail
 )
 echo.
-echo Versary: http://127.0.0.1:3000
+if not defined VERSARY_PORT set "VERSARY_PORT=3000"
+echo Versary: http://127.0.0.1:%VERSARY_PORT%
  echo Login de demonstracao: Talita / 1234 ou acesso visitante.
 echo Dataset demonstrativo: import_demonstracao. Dados ficticios identificados.
 echo Mantenha esta janela aberta. Ctrl+C encerra o servidor.
-call npm run start -- --hostname 127.0.0.1 --port 3000
+call npm run start -- --hostname 127.0.0.1 --port %VERSARY_PORT%
 if errorlevel 1 goto fail
 exit /b 0
 :no_node

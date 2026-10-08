@@ -221,7 +221,13 @@ export default function MachineDetailsPage({
 }: {
   params: Promise<{ machine: string }>;
 }) {
-  const { machine: machineName } = use(params);
+  const { machine } = use(params);
+  let machineName = machine;
+  try {
+    machineName = decodeURIComponent(machine);
+  } catch {
+    // Preserve a literal percent sign when the name is already decoded.
+  }
   return <MachineAnalytics key={machineName} machineName={machineName} />;
 }
 
