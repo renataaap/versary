@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawn } from "node:child_process";
 import { NextResponse } from "next/server";
-import { saveImportedTable } from "@/lib/mysql";
+import { saveImportedTable } from "@/lib/sqlite";
 
 export const runtime = "nodejs";
 
@@ -125,7 +125,7 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Erro desconhecido ao importar a planilha.";
-    const status = message.startsWith("Configure as variáveis") ? 503 : 500;
+    const status = /Banco SQLite não encontrado|SQLITE_CANTOPEN|SQLITE_BUSY|SQLITE_READONLY/.test(message) ? 503 : 500;
     return NextResponse.json(
       { error: `Não foi possível importar o Excel. ${message}` },
       { status },

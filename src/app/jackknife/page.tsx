@@ -234,7 +234,7 @@ export default function JackKnifePage() {
                     <ReferenceLine x={chart.frequencyLimit} stroke="#c9232b" strokeWidth={1.5} label={{ value: `Limite frequência: ${chart.frequencyLimit.toFixed(1)}`, position: "insideTopRight", fill: "#8f1820", fontSize: 10 }} />
                     <ReferenceLine y={chart.mttrLimit} stroke="#8f1820" strokeWidth={1.5} label={{ value: `Limite criticidade: ${chart.mttrLimit.toFixed(1)} min`, position: "insideTopLeft", fill: "#8f1820", fontSize: 10 }} />
                     {Object.entries(categoryColors).map(([category, fill]) => (
-                      <Scatter
+                      <Scatter isAnimationActive={false}
                         key={category}
                         name={category}
                         data={chart.points.filter((point) => point.category === category)}

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getLatestImportedTable } from "@/lib/mysql";
+import { getLatestImportedTable } from "@/lib/sqlite";
 
 export const runtime = "nodejs";
 

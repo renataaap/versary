@@ -290,10 +290,10 @@ export default function OtherChartsPage() {
                       <YAxis tick={{ fill: "#806d68", fontSize: 11 }} tickFormatter={(value) => Number(value).toLocaleString("pt-BR")} />
                       <Tooltip formatter={(value) => [formatMinutes(Number(value)), "Tempo parado"]} />
                       <Legend />
-                      <Bar dataKey="criticalChronic" name="Crítico-crônico" stackId="criticality" fill={categoryColors["Crítico-crônico"]} />
-                      <Bar dataKey="critical" name="Crítico" stackId="criticality" fill={categoryColors.Crítico} />
-                      <Bar dataKey="chronic" name="Crônico" stackId="criticality" fill={categoryColors.Crônico} />
-                      <Bar dataKey="comfort" name="Conforto" stackId="criticality" fill={categoryColors.Conforto} />
+                      <Bar isAnimationActive={false} dataKey="criticalChronic" name="Crítico-crônico" stackId="criticality" fill={categoryColors["Crítico-crônico"]} />
+                      <Bar isAnimationActive={false} dataKey="critical" name="Crítico" stackId="criticality" fill={categoryColors.Crítico} />
+                      <Bar isAnimationActive={false} dataKey="chronic" name="Crônico" stackId="criticality" fill={categoryColors.Crônico} />
+                      <Bar isAnimationActive={false} dataKey="comfort" name="Conforto" stackId="criticality" fill={categoryColors.Conforto} />
                     </BarChart>
                   ) : chartType === "projection" ? (
                     <ComposedChart data={graphs.monthly} margin={{ top: 18, right: 18, left: 0, bottom: 8 }}>
@@ -302,8 +302,8 @@ export default function OtherChartsPage() {
                       <YAxis tick={{ fill: "#806d68", fontSize: 11 }} tickFormatter={(value) => Number(value).toLocaleString("pt-BR")} />
                       <Tooltip formatter={(value, name) => [formatMinutes(Number(value)), name]} />
                       <Legend />
-                      <Bar dataKey="actual" name="Realizado" fill="#c9232b" />
-                      <Line dataKey="target" name="Meta de projeção (−10%)" type="monotone" stroke="#4b2b25" strokeWidth={2.5} dot={{ r: 3, fill: "#fff", stroke: "#4b2b25", strokeWidth: 2 }} />
+                      <Bar isAnimationActive={false} dataKey="actual" name="Realizado" fill="#c9232b" />
+                      <Line isAnimationActive={false} dataKey="target" name="Meta de projeção (−10%)" type="monotone" stroke="#4b2b25" strokeWidth={2.5} dot={{ r: 3, fill: "#fff", stroke: "#4b2b25", strokeWidth: 2 }} />
                     </ComposedChart>
                   ) : (
                     <BarChart data={graphs.waterfall} margin={{ top: 18, right: 16, left: 0, bottom: 66 }}>
@@ -315,7 +315,7 @@ export default function OtherChartsPage() {
                         labelFormatter={(_, payload) => payload[0]?.payload?.name || ""}
                       />
                       <Bar dataKey="base" stackId="waterfall" fill="transparent" legendType="none" isAnimationActive={false} />
-                      <Bar dataKey="value" name="Tempo parado" stackId="waterfall">
+                      <Bar isAnimationActive={false} dataKey="value" name="Tempo parado" stackId="waterfall">
                         {graphs.waterfall.map((point) => <Cell key={point.name} fill={point.total ? "#8f1820" : "#c9232b"} />)}
                       </Bar>
                     </BarChart>

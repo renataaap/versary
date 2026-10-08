@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getUniqueMachines } from "@/lib/mysql";
+import { getUniqueMachines } from "@/lib/sqlite";
 
 export const runtime = "nodejs";
 

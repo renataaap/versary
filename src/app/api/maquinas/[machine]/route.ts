@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getMachineStopDetails } from "@/lib/mysql";
+import { getMachineStopDetails } from "@/lib/sqlite";
 
 export const runtime = "nodejs";
 

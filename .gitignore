@@ -43,3 +43,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Banco SQLite local e auxiliares
+/data/versary.sqlite*
+
+# Distribuicao e runtimes locais
+/.runtime/
+/entrega/

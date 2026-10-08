@@ -195,8 +195,8 @@ export default function DashboardPage() {
                   />
                   <Legend verticalAlign="top" height={30} />
                   <ReferenceLine yAxisId="percent" y={80} stroke="#d6928d" strokeDasharray="4 4" label={{ value: "80%", fill: "#c9232b", fontSize: 11 }} />
-                  <Bar yAxisId="minutes" dataKey="minutes" name="Tempo em minutos" fill="#8f1820" radius={[3, 3, 0, 0]} />
-                  <Line yAxisId="percent" dataKey="accumulated" name="Acumulado" type="monotone" stroke="#c9232b" strokeWidth={2.5} dot={{ r: 3, fill: "#fff", stroke: "#c9232b", strokeWidth: 2 }} />
+                  <Bar isAnimationActive={false} yAxisId="minutes" dataKey="minutes" name="Tempo em minutos" fill="#8f1820" radius={[3, 3, 0, 0]} />
+                  <Line isAnimationActive={false} yAxisId="percent" dataKey="accumulated" name="Acumulado" type="monotone" stroke="#c9232b" strokeWidth={2.5} dot={{ r: 3, fill: "#fff", stroke: "#c9232b", strokeWidth: 2 }} />
                 </ComposedChart>
               </ResponsiveContainer>
             </div>

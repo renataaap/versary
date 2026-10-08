@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" role="img" aria-labelledby="title desc">
+  <title id="title">Fundo abstrato Coca-Cola FEMSA</title>
+  <desc id="desc">Composição clara com faixas curvas em vermelho, vinho e rosa suave.</desc>
+  <rect width="1600" height="1000" fill="#F7F8FA"/>
+  <path d="M1600 0h-238c31 114 112 171 130 286 21 135-54 223-23 349 20 80 72 137 131 180V0Z" fill="#8A1538" opacity=".055"/>
+  <path d="M1600 0h-155c3 97 75 171 82 269 9 124-69 218-46 329 13 62 57 118 119 157V0Z" fill="#DA291C" opacity=".07"/>
+  <path d="M0 872c290-75 546-37 789-60 322-31 526-151 811-292v480H0V872Z" fill="#F9DAD7" opacity=".72"/>
+  <path d="M0 918c312-81 566-37 824-68 312-38 526-146 776-264v414H0v-82Z" fill="#DA291C" opacity=".055"/>
+  <path d="M0 960c303-64 587-27 862-61 289-36 512-128 738-230v331H0v-40Z" fill="#8A1538" opacity=".05"/>
+  <path d="M0 812c286-61 538-27 769-49 312-30 537-135 831-285" fill="none" stroke="#DA291C" stroke-width="2" opacity=".13"/>
+</svg>

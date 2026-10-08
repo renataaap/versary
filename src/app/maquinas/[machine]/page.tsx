@@ -425,7 +425,7 @@ function MachineAnalytics({ machineName }: { machineName: string }) {
                       <XAxis dataKey="name" angle={-28} textAnchor="end" interval={0} height={78} tick={{ fill: "#806d68", fontSize: 10 }} />
                       <YAxis allowDecimals={false} tick={{ fill: "#806d68", fontSize: 11 }} />
                       <Tooltip />
-                      <Bar dataKey="occurrences" name="Ocorrências" fill="#8f1820" radius={[4, 4, 0, 0]} />
+                      <Bar isAnimationActive={false} dataKey="occurrences" name="Ocorrências" fill="#8f1820" radius={[4, 4, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -443,7 +443,7 @@ function MachineAnalytics({ machineName }: { machineName: string }) {
                 <div className="machine-detail-chart machine-detail-pie-chart">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
-                      <Pie data={summary.pieData} dataKey="value" nameKey="name" innerRadius="48%" outerRadius="76%" paddingAngle={3}>
+                      <Pie isAnimationActive={false} data={summary.pieData} dataKey="value" nameKey="name" innerRadius="48%" outerRadius="76%" paddingAngle={3}>
                         {summary.pieData.map((item, index) => (
                           <Cell key={item.name} fill={chartColors[index % chartColors.length]} />
                         ))}
@@ -472,7 +472,7 @@ function MachineAnalytics({ machineName }: { machineName: string }) {
                       <XAxis dataKey="label" tick={{ fill: "#806d68", fontSize: 10 }} />
                       <YAxis allowDecimals={false} tick={{ fill: "#806d68", fontSize: 11 }} />
                       <Tooltip />
-                      <Line dataKey="occurrences" name="Ocorrências" type="monotone" stroke="#c9232b" strokeWidth={2.5} dot={{ r: 3 }} />
+                      <Line isAnimationActive={false} dataKey="occurrences" name="Ocorrências" type="monotone" stroke="#c9232b" strokeWidth={2.5} dot={{ r: 3 }} />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
@@ -497,8 +497,8 @@ function MachineAnalytics({ machineName }: { machineName: string }) {
                       <YAxis yAxisId="percent" orientation="right" domain={[0, 100]} tickFormatter={(value) => `${value}%`} tick={{ fill: "#c9232b", fontSize: 10 }} />
                       <Tooltip />
                       <Legend verticalAlign="top" height={30} />
-                      <Bar yAxisId="value" dataKey="value" name={summary.paretoMetric} fill="#8f1820" radius={[3, 3, 0, 0]} />
-                      <Line yAxisId="percent" dataKey="accumulated" name="% acumulado" type="monotone" stroke="#c9232b" strokeWidth={2.5} dot={{ r: 3 }} />
+                      <Bar isAnimationActive={false} yAxisId="value" dataKey="value" name={summary.paretoMetric} fill="#8f1820" radius={[3, 3, 0, 0]} />
+                      <Line isAnimationActive={false} yAxisId="percent" dataKey="accumulated" name="% acumulado" type="monotone" stroke="#c9232b" strokeWidth={2.5} dot={{ r: 3 }} />
                     </ComposedChart>
                   </ResponsiveContainer>
                 </div>

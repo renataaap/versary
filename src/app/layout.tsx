@@ -3,8 +3,8 @@ import "./globals.css";
 import { AppLayoutShell } from "@/components/app-layout-shell";
 
 export const metadata: Metadata = {
-  title: "Pareto | Coca Green",
-  description: "Acompanhe seus indicadores de sustentabilidade.",
+  title: "Versary | Manutenção Industrial · Marília",
+  description: "Gestão de manutenção industrial da Coca-Cola FEMSA — Unidade Marília.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

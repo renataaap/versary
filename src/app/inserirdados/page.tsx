@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ChangeEvent, useState } from "react";
-import { getLoggedInUser, getUserRole } from "@/lib/client-auth";
+import { ChangeEvent, useState, useSyncExternalStore } from "react";
+import { getLoggedInUser, getUserRole, subscribeToAuthChanges } from "@/lib/client-auth";
 
 type ImportResult = {
   sheet: string;
@@ -20,8 +20,8 @@ export default function InsertDataPage() {
   const [result, setResult] = useState<ImportResult | null>(null);
   const [error, setError] = useState("");
   const [isImporting, setIsImporting] = useState(false);
-  const loggedUser = getLoggedInUser();
-  const isAdmin = getUserRole() === "admin";
+  const loggedUser = useSyncExternalStore(subscribeToAuthChanges, getLoggedInUser, () => null);
+  const isAdmin = useSyncExternalStore(subscribeToAuthChanges, getUserRole, () => "visitor") === "admin";
 
   if (!isAdmin) {
     return (

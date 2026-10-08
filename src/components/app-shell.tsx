@@ -1,163 +1,146 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
-import { useRouter } from "next/navigation";
-import { useSyncExternalStore } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { clearLoggedInUser, getLoggedInUser, getUserRole, subscribeToAuthChanges } from "@/lib/client-auth";
+import Brand from "@/components/ui/Brand";
+import Modal from "@/components/ui/Modal";
+import ShellIcon, { type ShellIconName } from "@/components/ui/ShellIcon";
 
-type IconName = "dashboard" | "search" | "file" | "table" | "settings" | "classification" | "prediction";
-
-const navigation: { href: string; label: string; icon: IconName }[] = [
-  { href: "/dashboard", label: "Dashboard", icon: "dashboard" },
-  { href: "/pareto", label: "Análise", icon: "search" },
-  { href: "/classificacaofalhas", label: "Classificação", icon: "classification" },
-  { href: "/predicoes", label: "Realizar nova predição", icon: "prediction" },
-  { href: "/inserirdados", label: "Inserir dados", icon: "file" },
-  { href: "/tabelas", label: "Tabelas", icon: "table" },
-  { href: "/maquinas", label: "Máquinas", icon: "settings" },
+const navigation: { href: string; label: string; icon: ShellIconName; section: "operation" | "administration" }[] = [
+  { href: "/dashboard", label: "Painel principal", icon: "dashboard", section: "operation" },
+  { href: "/maquinas", label: "Máquinas", icon: "machine", section: "operation" },
+  { href: "/classificacaofalhas", label: "Classificação de falhas", icon: "classification", section: "operation" },
+  { href: "/pareto", label: "Análises", icon: "analysis", section: "operation" },
+  { href: "/predicoes", label: "Realizar nova predição", icon: "prediction", section: "operation" },
+  { href: "/tabelas", label: "Tabelas", icon: "table", section: "administration" },
+  { href: "/inserirdados", label: "Importação de dados", icon: "upload", section: "administration" },
 ];
-const navigationWithInsertLast = [
-  ...navigation.filter((item) => item.href !== "/inserirdados"),
-  ...navigation.filter((item) => item.href === "/inserirdados"),
-];
-
-function NavigationIcon({ name }: { name: IconName }) {
-  const common = {
-    fill: "none",
-    stroke: "currentColor",
-    strokeLinecap: "round" as const,
-    strokeLinejoin: "round" as const,
-    strokeWidth: 2.25,
-  };
-
-  if (name === "dashboard") {
-    return (
-      <svg viewBox="0 0 32 32" aria-hidden="true">
-        <path {...common} d="M5 27h23" />
-        <rect {...common} x="7" y="18" width="4" height="9" rx="1" />
-        <rect {...common} x="14" y="12" width="4" height="15" rx="1" />
-        <rect {...common} x="21" y="5" width="4" height="22" rx="1" />
-      </svg>
-    );
-  }
-
-  if (name === "search") {
-    return (
-      <svg viewBox="0 0 32 32" aria-hidden="true">
-        <circle {...common} cx="13.5" cy="13.5" r="8" />
-        <path {...common} d="m19.5 19.5 7 7" />
-      </svg>
-    );
-  }
-
-  if (name === "file") {
-    return (
-      <svg viewBox="0 0 32 32" aria-hidden="true">
-        <path {...common} d="M9 3h10l6 6v19H9a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3Z" />
-        <path {...common} d="M19 3v7h6M11 16h10M11 21h10" />
-      </svg>
-    );
-  }
-
-  if (name === "settings") {
-    return (
-      <svg viewBox="0 0 32 32" aria-hidden="true">
-        <path {...common} d="M13 4h6l1 4a9 9 0 0 1 2 1l3-2 4 4-2 3a9 9 0 0 1 1 2l4 1v6l-4 1a9 9 0 0 1-1 2l2 3-4 4-3-2a9 9 0 0 1-2 1l-1 4h-6l-1-4a9 9 0 0 1-2-1l-3 2-4-4 2-3a9 9 0 0 1-1-2l-4-1v-6l4-1a9 9 0 0 1 1-2L2 11l4-4 3 2a9 9 0 0 1 2-1l1-4Z" transform="translate(0 -1) scale(.9)" />
-        <circle {...common} cx="16" cy="16" r="4" />
-      </svg>
-    );
-  }
-
-  if (name === "classification") {
-    return (
-      <svg viewBox="0 0 32 32" aria-hidden="true">
-        <path {...common} d="M8 5h16a2 2 0 0 1 2 2v19H6V7a2 2 0 0 1 2-2Z" />
-        <path {...common} d="M11 12h3M17 12h4M11 18h3M17 18h4M11 24l2 2 4-4" />
-      </svg>
-    );
-  }
-
-  if (name === "prediction") {
-    return (
-      <svg viewBox="0 0 32 32" aria-hidden="true">
-        <path {...common} d="M16 4v15m0 0 6-6m-6 6-6-6M6 21v5a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5" />
-      </svg>
-    );
-  }
-
-  return (
-    <svg viewBox="0 0 32 32" aria-hidden="true">
-      <rect {...common} x="5" y="5" width="22" height="22" rx="2" />
-      <path {...common} d="M5 12h22M5 19h22M12 5v22M20 5v22" />
-    </svg>
-  );
+function isActiveRoute(pathname: string, href: string) {
+  return href === "/pareto" ? ["/pareto", "/jackknife", "/outrosgraficos"].includes(pathname) : pathname === href || pathname.startsWith(`${href}/`);
 }
-
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const reduceMotion = useReducedMotion();
   const router = useRouter();
   const loggedUser = useSyncExternalStore(subscribeToAuthChanges, getLoggedInUser, () => null);
   const userRole = useSyncExternalStore(subscribeToAuthChanges, getUserRole, () => "visitor");
   const isAdmin = userRole === "admin";
-  const visibleNavigation = navigationWithInsertLast.filter(
-    (item) => isAdmin || item.href !== "/inserirdados",
-  );
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
+  const sidebar = useRef<HTMLElement>(null);
+  const content = useRef<HTMLDivElement>(null);
+  const mainContent = useRef<HTMLElement>(null);
+  const menuButton = useRef<HTMLButtonElement>(null);
+  const notificationButton = useRef<HTMLButtonElement>(null);
+  const notifications = useRef<HTMLDivElement>(null);
+  const visibleNavigation = navigation.filter((item) => isAdmin || item.href !== "/inserirdados");
+  const current = navigation.find((item) => isActiveRoute(pathname, item.href));
+  const displayName = loggedUser || "Visitante";
+  const initials = displayName.split(/\s+/).map((part) => part[0]).slice(0, 2).join("").toUpperCase();
 
+  useEffect(() => {
+    const media = window.matchMedia("(min-width: 1024px)");
+    const update = () => {
+      if (sidebar.current) sidebar.current.inert = !media.matches && !mobileOpen;
+      if (media.matches) setMobileOpen(false);
+    };
+    update();
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, [mobileOpen]);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const contentElement = content.current;
+    const menuElement = menuButton.current;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    if (contentElement) contentElement.inert = true;
+    sidebar.current?.querySelector<HTMLAnchorElement>("a")?.focus();
+    const handleKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMobileOpen(false);
+      if (event.key !== "Tab") return;
+      const targets = sidebar.current?.querySelectorAll<HTMLElement>('a[href], button:not([disabled])');
+      if (!targets?.length) return;
+      const first = targets[0];
+      const last = targets[targets.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    };
+    document.addEventListener("keydown", handleKey);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      if (contentElement) contentElement.inert = false;
+      document.removeEventListener("keydown", handleKey);
+      menuElement?.focus({ preventScroll: true });
+    };
+  }, [mobileOpen]);
+
+  useEffect(() => {
+    if (!notificationsOpen) return;
+    notifications.current?.focus();
+    const handleKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") { setNotificationsOpen(false); notificationButton.current?.focus(); }
+    };
+    const handlePointer = (event: PointerEvent) => {
+      if (event.target instanceof Node && !notifications.current?.contains(event.target) && !notificationButton.current?.contains(event.target)) setNotificationsOpen(false);
+    };
+    document.addEventListener("keydown", handleKey);
+    document.addEventListener("pointerdown", handlePointer);
+    return () => { document.removeEventListener("keydown", handleKey); document.removeEventListener("pointerdown", handlePointer); };
+  }, [notificationsOpen]);
+
+  useEffect(() => {
+    const element = mainContent.current;
+    if (!element) return;
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const curtain = element.closest('[inert][aria-hidden="true"]');
+    let animation: Animation | undefined;
+    let played = false;
+    const play = () => {
+      if (played || element.closest('[inert][aria-hidden="true"]')) return;
+      played = true;
+      observer?.disconnect();
+      if (!media.matches) animation = element.animate([
+        { opacity: 0, transform: "translateY(8px)" },
+        { opacity: 1, transform: "none" },
+      ], { duration: 250, easing: "ease-out" });
+    };
+    const observer = curtain ? new MutationObserver(play) : null;
+    if (curtain) observer?.observe(curtain, { attributes: true, attributeFilter: ["inert", "aria-hidden"] });
+    play();
+    const stopForReducedMotion = () => { if (media.matches) animation?.cancel(); };
+    media.addEventListener("change", stopForReducedMotion);
+    return () => {
+      observer?.disconnect();
+      animation?.cancel();
+      media.removeEventListener("change", stopForReducedMotion);
+    };
+  }, [pathname]);
+
+  const closeNavigation = () => { setMobileOpen(false); setNotificationsOpen(false); };
   return (
-    <div className="app-shell">
-      <aside className="sidebar" aria-label="Navegação principal">
-        <Link href="/dashboard" className="sidebar-logo" aria-label="Ir para o dashboard">
-          <Image
-            src="/Coca-Cola-circular.png"
-            alt="Coca-Cola"
-            width={82}
-            height={82}
-            priority
-          />
-        </Link>
-
-        <nav className="sidebar-nav">
-          {visibleNavigation.map((item) => {
-            const isActive = pathname === item.href;
-            return (
-              <Link
-                href={item.href}
-                key={item.href}
-                className={`sidebar-link${isActive ? " sidebar-link-active" : ""}`}
-                aria-current={isActive ? "page" : undefined}
-                title={item.label}
-              >
-                <NavigationIcon name={item.icon} />
-                <span>{item.label}</span>
-              </Link>
-            );
-          })}
-        </nav>
-
-        {loggedUser && (
-          <div className="sidebar-user">
-            <Image src="/Coca-Cola-circular.png" alt="" width={38} height={38} />
-            <div className="sidebar-user-copy">
-              <span>{isAdmin ? "Admin" : "Visitante"}</span>
-              <strong>{loggedUser}</strong>
-            </div>
-            <button
-              type="button"
-              className="sidebar-logout"
-              onClick={() => {
-                clearLoggedInUser();
-                router.push("/login");
-              }}
-            >
-              Sair
-            </button>
-          </div>
-        )}
+    <div className="versary-shell">
+      <a href="#conteudo-principal" className="shell-skip-link">Ir para o conteúdo principal</a>
+      <AnimatePresence>{mobileOpen && <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduceMotion ? 0.08 : 0.18 }} type="button" className="shell-backdrop" aria-label="Fechar navegação" tabIndex={-1} onClick={() => setMobileOpen(false)} />}</AnimatePresence>
+      <aside ref={sidebar} id="versary-sidebar" className={`shell-sidebar${mobileOpen ? " shell-sidebar-open" : ""}`} role={mobileOpen ? "dialog" : "complementary"} aria-modal={mobileOpen || undefined} aria-label="Navegação principal da manutenção">
+        <Link href="/dashboard" className="shell-logo" onClick={closeNavigation} aria-label="Coca-Cola FEMSA — ir para o dashboard"><Brand /><span><strong>FEMSA</strong><small>Manutenção · Marília</small></span></Link>
+        <button type="button" className="shell-sidebar-close shell-icon-button" aria-label="Fechar navegação" onClick={() => setMobileOpen(false)}><ShellIcon name="close" /></button>
+        <div className="shell-unit"><span className="shell-unit-icon"><ShellIcon name="machine" /></span><div><strong>Unidade Marília</strong><small>São Paulo, Brasil</small></div><ShellIcon name="shield" /></div>
+        {(["operation", "administration"] as const).map((section) => <div className="shell-nav-section" key={section}><p className="shell-section-label">{section === "operation" ? "OPERAÇÃO" : "ADMINISTRAÇÃO"}</p><nav aria-label={section === "operation" ? "Módulos de operação" : "Módulos de administração"}>{visibleNavigation.filter((item) => item.section === section).map((item) => <Link key={item.href} href={item.href} onClick={closeNavigation} className={`shell-nav-link${isActiveRoute(pathname, item.href) ? " shell-nav-link-active" : ""}`} aria-current={isActiveRoute(pathname, item.href) ? "page" : undefined}><ShellIcon name={item.icon} /><span>{item.label}</span></Link>)}</nav></div>)}
+        <div className="shell-sidebar-bottom"><button type="button" className="shell-help" onClick={() => { setMobileOpen(false); setHelpOpen(true); }}><ShellIcon name="help" /><span>Central de ajuda</span><ShellIcon name="external" /></button></div>
+        <div className="shell-user"><span className="shell-avatar">{initials}</span><div><strong>{displayName}</strong><small>{isAdmin ? "Admin" : "Acesso público"}</small></div>{loggedUser && <button type="button" className="shell-icon-button" aria-label="Sair" title="Sair" onClick={() => { clearLoggedInUser(); router.push("/login"); }}><ShellIcon name="logout" /></button>}</div>
       </aside>
-      <main className="app-content">{children}</main>
+      <div ref={content} className="shell-content">
+        <header className="shell-header"><div className="shell-breadcrumb"><button ref={menuButton} type="button" className="shell-menu shell-icon-button" aria-label="Abrir navegação" aria-expanded={mobileOpen} aria-controls="versary-sidebar" onClick={() => setMobileOpen(true)}><ShellIcon name="menu" /></button><span className="shell-breadcrumb-parent">Manutenção</span><span className="shell-breadcrumb-separator"><ShellIcon name="chevron" /></span><strong>{current?.label || "Manutenção Industrial"}</strong></div><div className="shell-header-actions"><div className="shell-profile"><span>Perfil</span><span className="shell-profile-badge">{isAdmin ? "Admin" : "Visitante"}</span></div><button ref={notificationButton} type="button" className="shell-icon-button" aria-label="Notificações" aria-expanded={notificationsOpen} aria-controls="versary-notifications" onClick={() => setNotificationsOpen(!notificationsOpen)}><ShellIcon name="bell" /></button><span className="shell-header-avatar shell-avatar" aria-label={displayName}>{initials}</span></div></header>
+        <AnimatePresence>{notificationsOpen && <motion.div initial={{ opacity: 0, y: reduceMotion ? 0 : 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: reduceMotion ? 0 : 6 }} transition={{ duration: reduceMotion ? 0.08 : 0.18 }} ref={notifications} id="versary-notifications" className="shell-notifications" role="region" aria-label="Notificações da manutenção" tabIndex={-1}><div className="shell-modal-heading"><h2>Suas notificações</h2><button type="button" className="shell-icon-button" aria-label="Fechar notificações" onClick={() => { setNotificationsOpen(false); notificationButton.current?.focus(); }}><ShellIcon name="close" /></button></div><p>Nenhuma notificação disponível.</p></motion.div>}</AnimatePresence>
+        <main ref={mainContent} id="conteudo-principal" tabIndex={-1} className="shell-main shell-page-enter">{children}<footer className="shell-footer"><span>Coca-Cola FEMSA · Manutenção Industrial · Unidade Marília</span><span>Versary</span></footer></main>
+      </div>
+      <Modal open={helpOpen} title="Central de ajuda" onClose={() => setHelpOpen(false)}><p>Use o menu lateral para acessar o painel, máquinas, classificação e análises da manutenção.</p><p>O perfil visitante permite consultar os dados. A importação e as alterações de classificação seguem as permissões do seu perfil.</p><button type="button" className="shell-primary-button" onClick={() => setHelpOpen(false)}>Entendido</button></Modal>
     </div>
   );
 }
