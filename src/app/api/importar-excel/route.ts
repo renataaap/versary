@@ -9,7 +9,7 @@ import { saveImportedTable } from "@/lib/sqlite";
 export const runtime = "nodejs";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
-const allowedExtensions = new Set([".xlsx", ".xld", ".xls"]);
+const allowedExtensions = new Set([".xlsx", ".xlsm", ".xld", ".xls"]);
 
 type ParsedSheet = {
   sheet: string;
@@ -71,7 +71,7 @@ export async function POST(request: Request) {
 
   const extension = uploadedFile.name.slice(uploadedFile.name.lastIndexOf(".")).toLowerCase();
   if (!allowedExtensions.has(extension)) {
-    return NextResponse.json({ error: "Envie um arquivo no formato .xlsx, .xld ou .xls." }, { status: 400 });
+    return NextResponse.json({ error: "Envie um arquivo no formato .xlsx, .xlsm, .xld ou .xls." }, { status: 400 });
   }
 
   if (uploadedFile.size === 0 || uploadedFile.size > MAX_FILE_SIZE) {

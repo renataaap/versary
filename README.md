@@ -138,3 +138,13 @@ Se o notebook não permitir executar Node.js ou Python:
 ---
 
 **Regra para amanhã:** priorize mostrar um fluxo estável e verdadeiro. Não faça migrações estruturais ou instalações arriscadas minutos antes da apresentação.
+
+## Importação Excel sem pandas
+
+`scripts/parse_excel.py` lê `.xlsx` e `.xlsm` diretamente com openpyxl (`read_only=True`, `data_only=True`). Macros não são executadas; fórmulas usam o valor calculado salvo pelo Excel, pois openpyxl não recalcula fórmulas. Se o valor armazenado estiver ausente, a célula será vazia.
+
+Todas as abas são lidas; linhas totalmente vazias são descartadas. Cabeçalhos têm espaços externos removidos e nomes repetidos recebem sufixos. Células vazias seguem como string vazia; números e booleanos mantêm seus tipos no JSON; datas/horários são serializados como texto. A normalização SQL e a transação SQLite permanecem no adaptador existente.
+
+`.xls` antigo e o alias legado `.xld` dependem de xlrd (já incluído na distribuição básica). Não há dependência de pandas nessa leitura. Caso xlrd não esteja disponível, converta o arquivo para `.xlsx` ou instale a biblioteca antes da apresentação. Não houve teste completo com um arquivo real `.xls` nesta etapa.
+
+A API aceita `.xlsm`. O filtro visual do seletor permanece inalterado por solicitação: para escolher `.xlsm`, use a opção de mostrar todos os arquivos no diálogo do Windows. O caminho `.xlsx` foi validado pela interface.

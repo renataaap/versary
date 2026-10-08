@@ -1,7 +1,6 @@
 """Read Excel without pandas/native numerical DLLs; preserve the import JSON contract."""
 import json
 import sys
-from datetime import datetime, date
 from pathlib import Path
 
 if hasattr(sys.stdout, "reconfigure"):
@@ -24,7 +23,10 @@ def unique_headers(values):
 
 def read_sheets(file_path):
     if file_path.suffix.lower() in {".xls", ".xld"}:
-        import xlrd
+        try:
+            import xlrd
+        except ImportError as error:
+            raise ValueError("Arquivos .xls/.xld exigem xlrd. Instale xlrd ou converta a planilha para .xlsx.") from error
         workbook = xlrd.open_workbook(str(file_path))
         try:
             for sheet in workbook.sheets():
@@ -44,7 +46,7 @@ def read_sheets(file_path):
                 yield sheet.name, values
         finally:
             workbook.release_resources()
-    else:
+    elif file_path.suffix.lower() in {".xlsx", ".xlsm"}:
         from openpyxl import load_workbook
         workbook = load_workbook(file_path, read_only=True, data_only=True)
         try:
@@ -52,6 +54,8 @@ def read_sheets(file_path):
                 yield sheet.title, list(sheet.iter_rows(values_only=True))
         finally:
             workbook.close()
+    else:
+        raise ValueError("Formato não suportado. Utilize .xlsx, .xlsm ou .xls.")
 
 def parse_workbook(file_path):
     if not file_path.is_file():
