@@ -1,6 +1,8 @@
-/* global require, process, console */
-const {spawnSync}=require('node:child_process');
+import { createRequire } from "node:module";
+import { spawnSync } from "node:child_process";
+const loadPackage = createRequire(import.meta.url);
+
 function fail(message){console.error('[ERRO] '+message);process.exit(1);}
-try{require('next/package.json');const Database=require('better-sqlite3');const db=new Database(':memory:');db.prepare('SELECT 1').get();db.close();}catch(error){fail('Dependencias npm ou modulo nativo SQLite indisponiveis: '+error.message+'\nPrepare npm ci com internet ou copie node_modules compativel com Windows x64 e Node 24.');}
+try{loadPackage('next/package.json');const Database=loadPackage('better-sqlite3');const db=new Database(':memory:');db.prepare('SELECT 1').get();db.close();}catch(error){fail('Dependencias npm ou modulo nativo SQLite indisponiveis: '+error.message+'\nPrepare npm ci com internet ou copie node_modules compativel com Windows x64 e Node 24.');}
 const python=process.env.PYTHON_PATH||'python';const basic=spawnSync(python,['-c','import sys,sqlite3,openpyxl,xlrd; assert sys.version_info >= (3,10); print(sys.version.split()[0])'],{encoding:'utf8',windowsHide:true});if(basic.error||basic.status!==0)fail('Python/SQLite/openpyxl/xlrd indisponiveis: '+(basic.error?.message||basic.stderr));console.log('[OK] Node '+process.version+' '+process.arch+'; Python '+basic.stdout.trim()+'; SQLite e Excel disponiveis.');
 const ml=spawnSync(python,['-c','import pandas,sklearn,joblib'],{encoding:'utf8',windowsHide:true});if(ml.error||ml.status!==0){console.warn('[AVISO] ML indisponivel neste computador. Treinamento e predicoes nao estao prontos; nenhuma predicao sera simulada.');console.warn((ml.error?.message||ml.stderr||'').trim());}else console.log('[OK] Dependencias ML disponiveis; a primeira predicao pode exigir treinamento com as planilhas reais.');

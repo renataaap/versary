@@ -15,7 +15,7 @@ if exist ".venv\Scripts\python.exe" (
  if not defined PYTHON_PATH set "PYTHON_PATH=python"
 )
 if not defined SQLITE_PATH set "SQLITE_PATH=data/versary.sqlite"
-node scripts\verify_runtime.cjs
+node scripts\verify_runtime.mjs
 if errorlevel 1 goto fail
 "%PYTHON_PATH%" scripts\manage_sqlite.py init
 if errorlevel 1 goto fail
